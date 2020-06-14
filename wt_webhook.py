@@ -25,6 +25,15 @@ def github_webhook():
         pass
     return "OK"
 
+@app.route("/wt_webhook", methods=["GET", "POST"])
+def wt_webhook():
+    if request.method == "POST":
+        logging.info(f'POST received in "/wt_webhook"')
+        data = request.get_json()
+        print(json.dumps(data, indent=4))
+    else:
+        pass
+    return "OK"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
