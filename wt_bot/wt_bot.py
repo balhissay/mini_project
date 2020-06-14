@@ -46,3 +46,6 @@ def send_markdown_all_spaces(markdown):
     for room in bot.rooms.list():
         logging.info(f'Sending message to room "{room.title}" ({room.id})')
         bot.messages.create(room.id, markdown = markdown)
+
+def get_message_details(message_id):
+    return bot.messages.get(message_id)

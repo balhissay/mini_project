@@ -30,7 +30,11 @@ def wt_webhook():
     if request.method == "POST":
         logging.info(f'POST received in "/wt_webhook"')
         data = request.get_json()
-        print(json.dumps(data, indent=4))
+        resource = data.get('resource', 'NA')
+        message_id = data.get('data', {}).get('id', '')
+        #data = data.get('data', {})
+        if message_id:
+            print(wt_bot.get_message_details(message_id))
     else:
         pass
     return "OK"
