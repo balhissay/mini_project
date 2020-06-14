@@ -50,6 +50,6 @@ def send_markdown_all_spaces(markdown):
 def get_message_details(message_id):
     return bot.messages.get(message_id).to_json()
 
-def send_message_several_spaces(message, roomIds_list):
+def send_message_several_spaces(roomIds_list, message):
     for roomId in roomIds_list:
         bot.messages.create(roomId, text = message)
