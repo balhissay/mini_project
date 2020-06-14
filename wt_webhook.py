@@ -35,7 +35,8 @@ def wt_webhook():
         #data = data.get('data', {})
         if message_id:
             message_json = wt_bot.get_message_details(message_id)
-            wt_bot.send_message_all_spaces(json.dumps(message_json, indent = 4))
+            print(json.dumps(message_json, indent = 4))
+            #wt_bot.send_message_all_spaces(json.dumps(message_json, indent = 4))
     else:
         pass
     return "OK"
