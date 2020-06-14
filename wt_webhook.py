@@ -1,4 +1,5 @@
 import logging
+import json
 from wt_bot import wt_bot
 from flask import Flask, render_template, request
 
@@ -14,8 +15,9 @@ def github_webhook():
     if request.method == "POST":
         logging.info(f'POST received in "/github_webhook". Sending message to WT')
         data = request.get_json()
-        print(data)
+        data_text = json.dumps(data, indent = 4)
         wt_bot.send_message_all_spaces("Pushed received in Github")
+        wt_bot.send_message_all_spaces(data_text)
     else:
         pass
     return "OK"
