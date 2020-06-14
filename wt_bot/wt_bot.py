@@ -40,3 +40,9 @@ def send_attachment_all_spaces(attachment_path):
     for room in bot.rooms.list():
         logging.info(f'Sending attachment to room "{room.title}" ({room.id})')
         bot.messages.create(room.id, files = attachment_path)
+
+def send_markdown_all_spaces(markdown):
+    # Send the message to all rooms the bot is in:
+    for room in bot.rooms.list():
+        logging.info(f'Sending message to room "{room.title}" ({room.id})')
+        bot.messages.create(room.id, markdown = markdown)
