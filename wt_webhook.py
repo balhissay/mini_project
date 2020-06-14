@@ -39,7 +39,7 @@ def wt_webhook():
             #print(json.dumps(message_json, indent = 4))
             text = message_dict.get('text', 'NA')
             final_text = re.sub(rf"^{wt_bot.bot_info.get('bot_name')}\s+", "", text)
-            wt_bot.send_message_all_spaces(final_text*5)
+            wt_bot.send_message_several_spaces([message_dict.get('roomId')], final_text*5)
     else:
         pass
     return "OK"
