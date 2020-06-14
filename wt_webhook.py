@@ -34,9 +34,9 @@ def wt_webhook():
         message_id = data.get('data', {}).get('id', '')
         #data = data.get('data', {})
         if message_id:
-            message_json = wt_bot.get_message_details(message_id)
+            message_dict = json.loads(wt_bot.get_message_details(message_id))
             #print(json.dumps(message_json, indent = 4))
-            wt_bot.send_message_all_spaces(message_json.get('text', 'NA'))
+            wt_bot.send_message_all_spaces(message_dict.get('text', 'NA'))
     else:
         pass
     return "OK"
