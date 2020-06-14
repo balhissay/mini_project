@@ -48,4 +48,4 @@ def send_markdown_all_spaces(markdown):
         bot.messages.create(room.id, markdown = markdown)
 
 def get_message_details(message_id):
-    return bot.messages.get(message_id)
+    return bot.messages.get(message_id).to_json()
