@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 from wt_bot import wt_bot
 from flask import Flask, render_template, request
 
@@ -36,7 +37,9 @@ def wt_webhook():
         if message_id:
             message_dict = json.loads(wt_bot.get_message_details(message_id))
             #print(json.dumps(message_json, indent = 4))
-            #wt_bot.send_message_all_spaces(message_dict.get('text', 'NA'))
+            text = message_dict.get('text', 'NA')
+            final_text = re.sub(rf"^{wt_bot.bot_info.get('bot_name')}\s+", "", text)
+            wt_bot.send_message_all_spaces(final_text)
     else:
         pass
     return "OK"
