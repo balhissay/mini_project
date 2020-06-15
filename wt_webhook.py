@@ -15,8 +15,8 @@ app = Flask(__name__)
 def github_webhook():
     if request.method == "POST":
         logging.info(f'POST received in "/github_webhook". Sending message to WT')
-        data = request.get_json()
-        if 'commit' in data:
+        data = json.loads(request.get_json())
+        if 'commits' in data or 'head_commit' in data:
             commit_id = data.get('head_commit', {}).get('id','NA')
             commit_message = data.get('head_commit', {}).get('message', 'NA')
             commit_author = data.get('head_commit', {}).get('author', {}).get('name', 'NA')
