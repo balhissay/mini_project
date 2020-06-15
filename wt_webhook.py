@@ -22,13 +22,12 @@ def github_webhook():
             commit_author = data.get('head_commit', {}).get('author', {}).get('name', 'NA')
             commit_repository = data.get('repository', {}).get('name', 'NA')
             data_text = f'Pushed received in Github: (**_{commit_message}_**) (_{commit_id}_) from **{commit_author}** to repository **{commit_repository}**'
-        #elif data.get('ref_type') == 'tag':
+        elif data.get('ref_type') == "tag":
+            data_text = f"Tag created in Github: **_{data.get('ref', 'NA')}_** from **{data.get('sender',{}).get('login', 'NA')}** on repository **{data.get('repository', {}).get('name', 'NA')}**"
         else:
-            data_text = "Not push"
-            with open("data_payload.json", "w") as file:
+            data_text = "Unknown event in Github"
+            with open("github_webhook_data.json", "w") as file:
                 file.write(json.dumps(data, indent = 4))
-        #else:
-        #    data_text = 'Unknown event in Github'
         wt_bot.send_markdown_all_spaces(data_text)
     else:
         pass
