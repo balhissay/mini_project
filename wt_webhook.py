@@ -24,7 +24,9 @@ def github_webhook():
             data_text = f'Pushed received in Github: (**_{commit_message}_**) (_{commit_id}_) from **{commit_author}** to repository **{commit_repository}**'
         #elif data.get('ref_type') == 'tag':
         else:
-            data_text = json.dumps(data, indent = 4)
+            data_text = "Not push"
+            with open("data_payload.json", "w") as file
+                file.write(json.dumps(data, indent = 4))
         #else:
         #    data_text = 'Unknown event in Github'
         wt_bot.send_markdown_all_spaces(data_text)
