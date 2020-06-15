@@ -16,6 +16,7 @@ def github_webhook():
     if request.method == "POST":
         logging.info(f'POST received in "/github_webhook". Sending message to WT')
         data = request.get_json()
+        print(data)
         commit_id = data.get('head_commit', {}).get('id','NA')
         commit_message = data.get('head_commit', {}).get('message', 'NA')
         commit_author = data.get('head_commit', {}).get('author', {}).get('name', 'NA')
