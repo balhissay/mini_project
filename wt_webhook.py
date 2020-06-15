@@ -15,17 +15,18 @@ app = Flask(__name__)
 def github_webhook():
     if request.method == "POST":
         logging.info(f'POST received in "/github_webhook". Sending message to WT')
-        data = json.loads(request.get_json())
+        data = request.get_json()
         if 'commits' in data or 'head_commit' in data:
             commit_id = data.get('head_commit', {}).get('id','NA')
             commit_message = data.get('head_commit', {}).get('message', 'NA')
             commit_author = data.get('head_commit', {}).get('author', {}).get('name', 'NA')
             commit_repository = data.get('repository', {}).get('name', 'NA')
             data_text = f'Pushed received in Github: (**_{commit_message}_**) (_{commit_id}_) from **{commit_author}** to repository **{commit_repository}**'
-        elif data.get('ref_type') == 'tag':
-            data_text = json.dumps(data, indent = 4)
+        #elif data.get('ref_type') == 'tag':
         else:
-            data_text = 'Unknown event in Github'
+            data_text = json.dumps(data, indent = 4)
+        #else:
+        #    data_text = 'Unknown event in Github'
         wt_bot.send_markdown_all_spaces(data_text)
     else:
         pass
