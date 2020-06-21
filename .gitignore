@@ -2,3 +2,4 @@
 __pycache__/
 .vscode/
 wt_bot/bot.yml
+DNAC_devices.yml
