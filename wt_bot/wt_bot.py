@@ -53,3 +53,9 @@ def get_message_details(message_id):
 def send_message_several_spaces(roomIds_list, message):
     for roomId in roomIds_list:
         bot.messages.create(roomId, text = message)
+
+def update_webhook(url):
+    #webhooks = {hook.id: hook.name for hook in bot.webhooks.list()}
+    for hook in bot.webhooks.list():
+        if hook.name == bot_info.get('webhook_name'):
+            bot.webhooks.update(hook.id, targetUrl = url + bot_info.get('webhook_path'))
