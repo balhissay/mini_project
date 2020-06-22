@@ -23,3 +23,6 @@ sleep 3
 URL=$($PYTHON_EXEC 'parse_tunnel_info.py' -f $FILE)
 # Python command to update the webhook URL in the testing service
 $PYTHON_EXEC 'update_wt_webhook.py' -u $URL
+# Update webhook in Spotify App and in spotify.yml
+$PYTHON_EXEC 'update_spotify_webhook.py' -u $URL
+echo "Update webhook in spotify App settings manually: https://developer.spotify.com/dashboard/applications"

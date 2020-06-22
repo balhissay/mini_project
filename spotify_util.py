@@ -20,6 +20,15 @@ def read_info_file():
         spotify_info = yaml.safe_load(handle)
     return spotify_info
 
+def update_webhook_in_file(url):
+    spotify_info = read_info_file()
+    spotify_info['redirect_uri'] = url + spotify_info.get('webhook_path')
+    print(spotify_info['redirect_uri'])
+    spotify_app_dir = os.path.abspath('spotipy')
+    path = os.path.join(spotify_app_dir, spotify_app_info_file)
+    with open(path, 'w') as handle:
+        yaml.dump(spotify_info, handle)
+
 def jprint(text):
     print(json.dumps(text, indent=4))
 
