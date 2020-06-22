@@ -2,6 +2,7 @@ import logging
 import yaml
 import time
 import json
+import re
 import os
 import requests
 import spotipy
@@ -9,6 +10,7 @@ import spotipy
 LOGGER = logging.getLogger(__name__)
 username = 'peloso'
 spotify_app_info_file = 'spotify.yml'
+users_file = 'users_db'
 
 def read_info_file():
     # Read spotify info file
@@ -17,6 +19,9 @@ def read_info_file():
     with open(path, 'r') as handle:
         spotify_info = yaml.safe_load(handle)
     return spotify_info
+
+def jprint(text):
+    print(json.dumps(text, indent=4))
 
 def _add_custom_values_to_token_info(token_info):
         """
@@ -34,6 +39,28 @@ def _save_token_info(token_info, cache_path):
             f.close()
         except IOError:
             LOGGER.warning('Couldn\'t write token to cache at: %s', cache_path)
+
+def _associate_users(wt_person_email, spotify_username = None):
+    with open(users_file, "r") as file:
+        content = file.read()
+        if content:
+            db = json.loads(content)
+        else:
+            db = {}
+    if wt_person_email in db:
+        if spotify_username and db[wt_person_email] != spotify_username:
+            db[wt_person_email] = spotify_username
+            with open(users_file, "w") as file:
+                file.write(json.dumps(db))
+        else:
+            return db[wt_person_email]
+    elif spotify_username:
+        db[wt_person_email] = spotify_username
+        with open(users_file, "w") as file:
+            file.write(json.dumps(db))
+        return spotify_username
+    else:
+        return None
 
 def get_user_token_or_auth_url(username, oauth_manager=None):
     spotify_info = read_info_file()
@@ -67,7 +94,7 @@ def get_token_from_code(code):
         raise Exception(response.reason)
     token_info = response.json()
     token_info = _add_custom_values_to_token_info(token_info)
-    print(token_info)
+    #print(token_info)
     me = get_my_info(token_info["access_token"])
     _save_token_info(token_info, spotify_info.get('cache_path').format(me['id']))
     return token_info["access_token"]
@@ -75,6 +102,45 @@ def get_token_from_code(code):
 def get_my_info(token):
     spoty = spotipy.Spotify(auth = token)
     return spoty.me()
+
+def spotify_message(command, person_email = None):
+    commands = re.split(r'\s+', command)
+    if len(commands) > 1:
+        if commands[1] == "auth":
+            if len(commands) > 2:
+                username = commands[2]
+                token = get_user_token_or_auth_url(username)
+                if 'http' in token:
+                    return f'User <{username}>, please go to the following url to authenticate and try again this command later: {token}'
+                elif token:
+                    # Associate person_email with spotify username
+                    response = _associate_users(person_email, username)
+                    if response:
+                        return f'User "{username}" correctly authenticated'
+                    else:
+                        return 'Error while saving the user'
+                else:
+                    return 'There was an error'
+            else:
+                return 'A spotify username is required after "auth"'
+        elif commands[1] == "status":
+            username = _associate_users(person_email)
+            if username:
+                token = get_user_token_or_auth_url(username)
+                if 'http' in token:
+                    return f'User {username} not authenticated. Please run "spotify auth {username}"' 
+                else:
+                    me = get_my_info(token)
+                    product = me.get('product', '')
+                    if product:
+                        return f'User "{username}" ({product}) is active'
+                    else:
+                        return f'Something is wrong with {username}'
+                    return json.dumps(get_my_info(token), indent=4)
+            else:
+                return f'User {person_email} not registered. Please run "spotify auth [spotify_username]"'
+    else:
+        return 'Valid options for spotify: auth, status'
 
 def main():
     result = get_user_token_or_auth_url(username = username)

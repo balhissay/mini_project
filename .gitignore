@@ -7,3 +7,4 @@ DNAC_devices.yml
 tunnel_output
 *.zip
 cache-*
+users_db

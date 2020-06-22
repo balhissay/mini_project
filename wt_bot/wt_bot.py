@@ -2,6 +2,7 @@ import yaml
 import json
 import time
 import os
+import re
 import logging
 from webexteamssdk import WebexTeamsAPI
 from webexteamssdk import RateLimitWarning
@@ -50,6 +51,9 @@ def send_markdown_all_spaces(markdown):
 def get_message_details(message_id):
     return bot.messages.get(message_id).to_json()
 
+def get_person_details(person_id):
+    return bot.people.get(person_id).to_json()
+
 def send_message_several_spaces(roomIds_list, message):
     for roomId in roomIds_list:
         bot.messages.create(roomId, text = message)
@@ -59,3 +63,10 @@ def update_webhook(url):
     for hook in bot.webhooks.list():
         if hook.name == bot_info.get('webhook_name'):
             bot.webhooks.update(hook.id, targetUrl = url + bot_info.get('webhook_path'))
+
+def filter_message(text):
+    spotify = re.match(r'spotify.*', text, flags=re.IGNORECASE)
+    if spotify:
+        return 'spotify'
+    else:
+        return None

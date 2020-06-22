@@ -37,17 +37,28 @@ def github_webhook():
 @app.route("/wt_webhook", methods=["GET", "POST"])
 def wt_webhook():
     if request.method == "POST":
-        logging.info(f'POST received in "/wt_webhook"')
+        logging.info(f'POST received in "{url_for("wt_webhook")}"')
         data = request.get_json()
-        #resource = data.get('resource', 'NA')
-        message_id = data.get('data', {}).get('id', '')
-        #data = data.get('data', {})
-        if message_id:
-            message_dict = json.loads(wt_bot.get_message_details(message_id))
-            #print(json.dumps(message_json, indent = 4))
-            text = message_dict.get('text', 'NA')
-            final_text = re.sub(rf"^{wt_bot.bot_info.get('bot_name')}\s+", "", text)
-            wt_bot.send_message_several_spaces([message_dict.get('roomId')], final_text*5)
+        #spotify_util.jprint(data)
+        resource = data.get('resource', 'NA')
+        if resource == 'messages':
+            message_id = data.get('data', {}).get('id', '')
+            if message_id:
+                message_dict = json.loads(wt_bot.get_message_details(message_id))
+                text = message_dict.get('text', 'NA')
+                final_text = re.sub(rf"^{wt_bot.bot_info.get('bot_name')}\s+", "", text)
+                #person_id = message_dict.get('personId', '')
+                person_email = message_dict.get('personEmail', '')
+                context = wt_bot.filter_message(final_text)
+                if context == "spotify":
+                    response = spotify_util.spotify_message(final_text, person_email)
+                    wt_bot.send_message_several_spaces([message_dict.get('roomId')], response)
+                else:
+                    wt_bot.send_message_several_spaces([message_dict.get('roomId')], final_text*5)
+            else:
+                logging.error('Message received without ID')
+        else:
+            logging.error('A new resource has been received')
     else:
         pass
     return "OK"
