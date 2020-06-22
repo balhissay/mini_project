@@ -2,7 +2,8 @@ import logging
 import json
 import re
 from wt_bot import wt_bot
-from flask import Flask, render_template, request
+import spotify_util
+from flask import Flask, render_template, request, url_for
 
 logging_level = logging.INFO
 
@@ -49,6 +50,14 @@ def wt_webhook():
             wt_bot.send_message_several_spaces([message_dict.get('roomId')], final_text*5)
     else:
         pass
+    return "OK"
+
+@app.route("/spotify_callback", methods=["GET"])
+def spotify_callback():
+    logging.info(f'GET received in "{url_for("spotify_callback")}"')
+    code = request.args.get('code')
+    if code:
+        spotify_util.get_token_from_code(code)
     return "OK"
 
 if __name__ == "__main__":

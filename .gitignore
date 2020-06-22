@@ -2,5 +2,8 @@
 __pycache__/
 .vscode/
 wt_bot/bot.yml
+spotipy/spotify.yml
 DNAC_devices.yml
 tunnel_output
+*.zip
+cache-*
