@@ -3,7 +3,8 @@ FILE="tunnel_output"
 SCHEME="http"
 PYTHON_EXEC="/home/carlos/miniconda3/envs/pb377/bin/python"
 PORT=5000
-REGION="eu"
+REGION="us"
+# With REGION "eu" Umbrella blocks the URLs
 
 while getopts pfsr option
 do
@@ -17,7 +18,7 @@ esac
 done
 # Open Reverse SSH to NGROK for creating a tunnel to the specified port
 ssh -o "StrictHostKeyChecking=no" -R 80:localhost:$PORT tunnel.$REGION.ngrok.com $SCHEME > $FILE &
-# Sleep 1 second so the file is updated
+# Sleep for a while so the file is updated
 sleep 3
 # Python command to parse FILE for getting the URL
 URL=$($PYTHON_EXEC 'parse_tunnel_info.py' -f $FILE)

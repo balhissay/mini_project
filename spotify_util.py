@@ -6,6 +6,7 @@ import re
 import os
 import requests
 import spotipy
+from spotipy.exceptions import SpotifyException
 
 LOGGER = logging.getLogger(__name__)
 username = 'peloso'
@@ -81,7 +82,11 @@ def get_user_token_or_auth_url(username, oauth_manager=None):
         cache_path = spotify_info.get('cache_path').format(username),
         username=username
     )
-    token_info = sp_oauth.get_cached_token()
+    try:
+        token_info = sp_oauth.get_cached_token()
+    except SpotifyException:
+        # For example: http status: 400, code:-1 - Couldn't refresh token: code:400 reason:Bad Request
+        return sp_oauth.get_authorize_url()
     if not token_info:
         return sp_oauth.get_authorize_url()
     else:
@@ -112,6 +117,16 @@ def get_my_info(token):
     spoty = spotipy.Spotify(auth = token)
     return spoty.me()
 
+def get_my_top(token, type = 'artists', limit = 5, time_range ='medium_term'):
+    spoty = spotipy.Spotify(auth = token)
+    if type == 'artists':
+        return spoty.current_user_top_artists(limit = limit, time_range = time_range)
+    elif type == 'tracks':
+        return spoty.current_user_top_tracks(limit = limit, time_range = time_range)
+    else:
+        return None
+
+
 def spotify_message(command, person_email = None):
     commands = re.split(r'\s+', command)
     if len(commands) > 1:
@@ -141,8 +156,10 @@ def spotify_message(command, person_email = None):
                 else:
                     me = get_my_info(token)
                     product = me.get('product', '')
+                    top = get_my_top(token)
+                    top_names = ", ".join([item['name'] for item in top.get('items', [])])
                     if product:
-                        return f'User "{username}" ({product}) is active'
+                        return f'User "{username}" ({product}) is active.\nFavorite artists: {top_names}'
                     else:
                         return f'Something is wrong with {username}'
                     return json.dumps(get_my_info(token), indent=4)
